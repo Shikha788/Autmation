@@ -1,0 +1,67 @@
+automated test script for three critical test scenarios:
+
+Verify that a user can register and log in successfully.
+Verify that a user cannot register with an empty field.
+Verify that a user cannot register with a username that already exists.
+import unittest
+from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By
+
+class TestRegistration(unittest.TestCase):
+
+    def setUp(self):
+        self.driver = webdriver.Chrome()
+        self.driver.get("https://www.example.com/register")
+
+    def test_successful_registration(self):
+        username_field = self.driver.find_element_by_name("username")
+        password_field = self.driver.find_element_by_name("password")
+        register_button = self.driver.find_element_by_css_selector(".register-button")
+
+        username_field.send_keys("testuser")
+        password_field.send_keys("testpassword")
+        register_button.click()
+
+        WebDriverWait(self.driver, 5).until(EC.presence_of_element_located((By.CSS_SELECTOR, ".login-button")))
+
+        login_button = self.driver.find_element_by_css_selector(".login-button")
+        self.assertTrue(login_button.is_displayed())
+
+    def test_empty_field_registration(self):
+        register_button = self.driver.find_element_by_css_selector(".register-button")
+        register_button.click()
+
+        error_message = self.driver.find_element_by_css_selector(".error-message")
+        self.assertTrue(error_message.is_displayed())
+
+    def test_existing_username_registration(self):
+        username_field = self.driver.find_element_by_name("username")
+        password_field = self.driver.find_element_by_name("password")
+        register_button = self.driver.find_element_by_css_selector(".register-button")
+
+        username_field.send_keys("existinguser")
+        password_field.send_keys("testpassword")
+        register_button.click()
+
+        error_message = self.driver.find_element_by_css_selector(".error-message")
+        self.assertTrue(error_message.is_displayed())
+
+    def tearDown(self):
+        self.driver.quit()
+
+if __name__ == "__main__":
+    unittest.main()
+
+Explanation:
+In this script, we use the Selenium WebDriver for Python to interact with the website. We have three test methods: test_successful_registration, test_empty_field_registration, and test_existing_username_registration. Each method tests a different test scenario.
+
+We use the WebDriverWait class to wait for specific elements to appear on the page. This ensures that our tests are not too fast and can potentially break the website.
+
+We use the assertTrue method to check if certain elements are displayed on the page. This allows us to verify that the expected behavior occurs.
+
+In the setUp method, we initialize the WebDriver and navigate to the registration page. In the tearDown method, we close the WebDriver after all tests have been executed.
+
+To manage test data, we directly input the test data (username and password) into the corresponding fields within the test methods. This approach is simple and sufficient for this example. However, for more complex scenarios, we could use test data files, databases, or data generation within the scripts.
